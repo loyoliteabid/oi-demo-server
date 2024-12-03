@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db";
 import airQualityRoutes from "./routes/airQualityRoutes";
-import { runIngestionProcess } from "./utils/ingestData";
+// import { runIngestionProcess } from "./utils/ingestData";
 
 dotenv.config();
 connectDB();
@@ -19,15 +19,15 @@ app.all("/", (req, res) => {
 });
 app.use("/api", airQualityRoutes);
 
-// Run data ingestion during server startup
-(async () => {
-  try {
-    console.log("Starting data ingestion process...");
-    await runIngestionProcess();
-  } catch (error) {
-    console.error("Error during data ingestion:", error);
-  }
-})();
+// // Run data ingestion during server startup
+// (async () => {
+//   try {
+//     console.log("Starting data ingestion process...");
+//     await runIngestionProcess();
+//   } catch (error) {
+//     console.error("Error during data ingestion:", error);
+//   }
+// })();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
