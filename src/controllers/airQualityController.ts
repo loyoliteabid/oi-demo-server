@@ -34,9 +34,15 @@ export const addInitialData = async (
   }
 
   try {
+    const uploadsDir = path.join(__dirname, "../uploads");
+
+    // Ensure the 'uploads' directory exists, create it if it doesn't
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true }); // 'recursive: true' will create nested directories if needed
+    }
+
     const tempFilePath = path.join(
-      __dirname,
-      "../uploads",
+      uploadsDir,
       `${Date.now()}_${req.file.originalname}`
     );
 

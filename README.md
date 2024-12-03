@@ -31,8 +31,6 @@ This server app is built with Node.js and TypeScript to handle data ingestion an
    npm run dev
    ```
    - The server will start listening on port `5000`.
-   - On startup, the app will attempt to download the [Air Quality Dataset](https://archive.ics.uci.edu/dataset/360/air+quality) using a Python script and ingest the data into MongoDB.
-   - If ingestion fails, you can manually upload the file through the frontend app ([OI Demo Client](https://github.com/loyoliteabid/oi-demo-client)).
 
 ---
 
@@ -63,7 +61,6 @@ src
 
 ## Features
 
-- **Data Ingestion**: Automatically downloads and ingests air quality data into MongoDB using `python-shell`.
 - **CSV Parsing**: Uses `papaparse` for parsing CSV files.
 - **Docker Support**: Optional Docker setup for easy deployment.
 
@@ -73,7 +70,7 @@ src
 
 ### Dockerfile
 
-The server is pre-configured with a `Dockerfile` to set up the Node.js environment along with Python dependencies for data ingestion.
+The server is pre-configured with a `Dockerfile` to set up the Node.js environment.
 
 ### Steps to Use Docker
 
@@ -118,9 +115,7 @@ Date;Time;CO(GT);PT08.S1(CO);NMHC(GT);C6H6(GT);PT08.S2(NMHC);NOx(GT);PT08.S3(NOx
 
 ## Notes
 
-- You may encounter the following error: `Error occurred while fetching data: PythonShellError: ModuleNotFoundError: No module named 'pandas'`. This indicates an issue with the Python environment, but no worries! You can still upload the CSV file manually through the frontend.
 - MongoDB must be running locally or accessible via the provided `MONGO_URI` (if not using Docker).
-- The auto-ingestion feature demonstrates usability but can be bypassed if manual CSV upload is preferred.
-- Ensure the Python environment is properly set up for running the Python script.
+- Ensure the CSV file is in the correct format before uploading.
 
 Feel free to explore and extend the app's functionality!
