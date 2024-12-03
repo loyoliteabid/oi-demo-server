@@ -1,68 +1,103 @@
-## Setup Instructions
+# OI Demo Server
+
+This server app is built with Node.js and TypeScript to handle data ingestion and backend operations for the OI Demo App. It processes air quality data collected from March 2004 to February 2005 by an air quality monitoring device located in an Italian city.
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js**: Ensure you have Node.js installed (v14 or higher recommended).
-- **Python**: Install Python (v3.7 or higher recommended) and ensure `pip` is available.
+- Ensure you have Node.js installed.
+- MongoDB must be installed and running on your machine.
 
-### Steps to Run the Application
+### Steps to Set Up
 
-### 1. Clone the repository:
+1. **Clone the Repository**
 
-```bash
-git clone <repository-url>
-cd <repository-folder>
+   ```bash
+   git clone https://github.com/loyoliteabid/oi-demo-server
+   cd oi-demo-server
+   ```
+
+2. **Install Dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the Server**
+   ```bash
+   npm run dev
+   ```
+   - The server will start listening on port `5000`.
+   - On startup, the app will attempt to download the [Air Quality Dataset](https://archive.ics.uci.edu/dataset/360/air+quality) using a Python script and ingest the data into MongoDB.
+   - If ingestion fails, you can manually upload the file through the frontend app ([OI Demo Client](https://github.com/loyoliteabid/oi-demo-client)).
+
+---
+
+## Environment Variables
+
+The `.env` file is ignored for security. Use `.env-example` as a reference and configure your environment:
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/air_quality_demo
 ```
 
 ---
 
-### 2. Install Node.js dependencies:
+## Project Structure
 
-```bash
-    npm install
+```plaintext
+src
+├── config
+├── controllers
+├── models
+├── routes
+├── uploads
+├── utils
+└── app.ts (root)
 ```
 
 ---
 
-### 3. Install Python dependencies:
+## Features
 
-```bash
-    pip install -r src/utils/requirements.txt
+- **Data Ingestion**: Automatically downloads and ingests air quality data into MongoDB using `python-shell`.
+- **CSV Parsing**: Uses `papaparse` for parsing CSV files.
+- **Docker Support**: Optional Docker setup for easy deployment.
+
+---
+
+## Docker Setup
+
+1. **Build Docker Image**
+
+   ```bash
+   docker build -t oi-demo-server .
+   ```
+
+2. **Run with Docker Compose**
+   ```bash
+   docker-compose up
+   ```
+
+---
+
+## CSV Format
+
+Ensure the uploaded CSV file has the following headers:
+
+```csv
+Date;Time;CO(GT);PT08.S1(CO);NMHC(GT);C6H6(GT);PT08.S2(NMHC);NOx(GT);PT08.S3(NOx);NO2(GT);PT08.S4(NO2);PT08.S5(O3);T;RH;AH;
 ```
 
 ---
 
-### 4. Start the server:
+## Notes
 
-```bash
-    npm run dev
-```
+- MongoDB must be running locally or accessible via the provided `MONGO_URI`.
+- The auto-ingestion feature demonstrates usability but can be bypassed if manual CSV upload is preferred.
+- Ensure the Python environment is properly set up for running the Python script.
 
-Notes
-The script automatically checks and installs Python dependencies if missing. Ensure pip is accessible globally.
-
----
-
-### 5. **Run in Any Environment**
-
-With this setup:
-
-1. The `requirements.txt` ensures the Python dependencies are portable.
-2. The script dynamically installs Python dependencies if they aren’t present.
-3. Documentation guides users to set up their environment properly.
-
----
-
-### 6. **Optional Enhancements**
-
-- **Dockerize the App**:
-  Create a Docker container to ensure consistent environments. This encapsulates Node.js and Python dependencies within a containerized environment.
-
-- **Virtual Environment**:
-  Use a Python virtual environment (`venv`) for isolated Python dependencies. This avoids conflicting system-wide packages.
-
----
-
-### Summary
-
-By using a `requirements.txt` file and automating dependency installation in `ingestData.ts`, your Python script becomes portable and self-sufficient. Include proper documentation to ensure smooth setup for other developers. Let me know if you'd like help with Dockerizing the project!
+Feel free to explore and extend the app's functionality!
