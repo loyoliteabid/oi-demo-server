@@ -1,0 +1,37 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs and editors
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# OS-generated files
+Thumbs.db
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+*.env.local
+
+# Optional NPM cache (useful if you want to speed up builds but not commit)
+.npm/
+.pnpm-debug.log
