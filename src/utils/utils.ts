@@ -5,6 +5,21 @@ import moment from "moment";
 
 import AirQuality from "../models/AirQuality";
 
+// Normalize date and time to a consistent format
+function normalizeDateTime(rawDate: string, rawTime: string): string {
+  const paddedDate = rawDate
+    .split("/")
+    .map((part) => part.padStart(2, "0")) // Ensure two digits for day and month
+    .join("/");
+
+  const paddedTime = rawTime
+    .split(".")
+    .map((part) => part.padStart(2, "0")) // Ensure two digits for hours, minutes, and seconds
+    .join(":");
+
+  return `${paddedDate} ${paddedTime}`;
+}
+
 // Map CSV row to AirQuality data
 export function mapToAirQuality(
   row: Record<string, string | undefined>
@@ -12,21 +27,25 @@ export function mapToAirQuality(
   const rawDate = row["Date"] || ""; // Get the date, empty if missing
   const rawTime = row["Time"] || ""; // Get the time, empty if missing
 
-  // Combine date and time into a valid ISO DateTime string
+  // Normalize and parse date and time
+  const normalizedDateTime = normalizeDateTime(rawDate, rawTime);
   const dateTime = moment
     .utc(
-      `${rawDate} ${rawTime}`,
-      "DD/MM/YYYY HH.mm.ss",
+      normalizedDateTime,
+      ["DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY HH.mm.ss"],
       true // Strict parsing
     )
     .isValid()
-    ? moment.utc(`${rawDate} ${rawTime}`, "DD/MM/YYYY HH.mm.ss").toDate() // ISO Date object
-    : null; // Invalid or missing, set to null
+    ? moment
+        .utc(normalizedDateTime, ["DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY HH.mm.ss"])
+        .toDate()
+    : null;
 
   // Helper to parse numbers safely (replace commas with dots for float values)
   const parseNumber = (value: string | undefined): number | null => {
-    const parsed = value ? parseFloat(value.replace(",", ".")) : null;
-    return isNaN(parsed as number) ? null : parsed;
+    if (!value) return null;
+    const parsed = parseFloat(value.replace(",", ".").trim());
+    return isNaN(parsed) ? null : parsed;
   };
 
   return {
@@ -50,12 +69,16 @@ export function mapToAirQuality(
 }
 
 // Ingest data from CSV file into MongoDB
-export async function ingestFromCSV(filePath: string) {
+export async function ingestFromCSV(filePath: string): Promise<void> {
   const rows: Record<string, any>[] = [];
+
   // Read the CSV file and parse using PapaParse
   const fileContent = fs.readFileSync(filePath, "utf-8");
 
-  const parsed = Papa.parse(fileContent, {
+  // Sanitize file content to remove trailing delimiters
+  const sanitizedContent = fileContent.replace(/;+\s*$/gm, "");
+
+  const parsed = Papa.parse<Record<string, string>>(sanitizedContent, {
     header: true, // Use the first row as header
     skipEmptyLines: true, // Skip empty lines
     delimiter: ";", // Define the delimiter as semicolon (adjust if necessary)
@@ -69,9 +92,7 @@ export async function ingestFromCSV(filePath: string) {
 
   for (const row of parsed.data) {
     try {
-      const mappedRow = mapToAirQuality(
-        row as Record<string, string | undefined>
-      ); // Validate and map row
+      const mappedRow = mapToAirQuality(row); // Validate and map row
 
       // Skip rows with invalid dateTime (if both date and time are invalid)
       if (!mappedRow.dateTime) {
